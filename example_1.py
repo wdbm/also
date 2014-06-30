@@ -30,12 +30,34 @@
 
 class AccumulatorLogicalAnd(object):
     def __init__(self):
-        self.resultCompound = True
+        self.attribute_all = True
+        self.attribute_any = False
+        self.attribute_none = None
+        self.attribute_numberTotal = 0
+        self.attribute_numberPassed = 0
+        self.attribute_numberFailed = 0
     def also(self, condition):
-        self.resultCompound = self.resultCompound and condition
+        self.attribute_all = self.attribute_all and condition
+        self.attribute_any = self.attribute_any or condition
+        self.attribute_none = not condition and (self.attribute_none is None or self.attribute_none)
+        self.attribute_numberTotal += 1
+        if condition:
+            self.attribute_numberPassed += 1
+        else:
+            self.attribute_numberFailed += 1
         return condition
-    def result(self):
-        return self.resultCompound
+    def all(self):
+        return self.attribute_all
+    def any(self):
+        return self.attribute_any
+    def none(self):
+        return self.attribute_none
+    def total(self):
+        return self.attribute_numberTotal
+    def passed(self):
+        return self.attribute_numberPassed
+    def failed(self):
+        return self.attribute_numberFailed
 
 def action1():
     print("action 1")
@@ -50,11 +72,18 @@ def main():
 
     accumulatorLogicalAnd = AccumulatorLogicalAnd()
     also = accumulatorLogicalAnd.also
-    all = accumulatorLogicalAnd.result
+    all = accumulatorLogicalAnd.all
+    any = accumulatorLogicalAnd.any
+    none = accumulatorLogicalAnd.none
+    total = accumulatorLogicalAnd.total
+    passed = accumulatorLogicalAnd.passed
+    failed = accumulatorLogicalAnd.failed
 
     condition1 = True
     condition2 = False
     condition3 = True
+
+    print
 
     if also(condition1):
         action1()
@@ -66,6 +95,15 @@ def main():
         print("all conditions passed")
     else:
         print("some conditions failed")
+
+    print
+    print("Did all pass?\t\t{result}".format(result = str(all())))
+    print("Did any pass?\t\t{result}".format(result = str(any())))
+    print("Did none pass?\t\t{result}".format(result = str(none())))
+    print("How many in total?\t{result}".format(result = str(total())))
+    print("How many passed?\t{result}".format(result = str(passed())))
+    print("How many failed?\t{result}".format(result = str(failed())))
+    print
 
 if __name__ == '__main__':
     main()
